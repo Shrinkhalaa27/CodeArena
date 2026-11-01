@@ -1,0 +1,22 @@
+# secrets
+.env
+.env.*
+!.env.example
+# python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+# node
+node_modules/
+.next/
+*.tsbuildinfo
+# test output
+test-results/
+playwright-report/
+# local data
+*.db
+pgdata/
+infra/judge0/judge0.conf

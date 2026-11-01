@@ -1,0 +1,17 @@
+# Copy to infra/judge0/judge0.conf. Placeholders only.
+# Judge0 CE 1.13.x - see https://github.com/judge0/judge0/blob/master/CHANGELOG.md for config options.
+REDIS_HOST=judge0-redis
+REDIS_PASSWORD=change-me-judge0-redis
+POSTGRES_HOST=judge0-db
+POSTGRES_DB=judge0
+POSTGRES_USER=judge0
+POSTGRES_PASSWORD=change-me-judge0-db
+# Require this token from the API/worker (set the same value as JUDGE0_AUTH_TOKEN in .env)
+AUTHN_HEADER=X-Auth-Token
+AUTHN_TOKEN=change-me-judge0-token
+# Sandbox policy: no network from submissions, bounded resources
+ALLOW_ENABLE_NETWORK=false
+MAX_CPU_TIME_LIMIT=15
+MAX_WALL_TIME_LIMIT=20
+MAX_MEMORY_LIMIT=512000
+MAX_PROCESSES_AND_OR_THREADS=60

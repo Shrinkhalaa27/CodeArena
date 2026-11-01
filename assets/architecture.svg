@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+<defs><style>
+.t{font: bold 20px Arial;fill:#eef2ff}.s{font:15px Arial;fill:#cbd5e1}.box{fill:#111827;stroke:#64748b;stroke-width:2;rx:16}.accent{stroke:#8b5cf6;stroke-width:3;fill:none}.line{stroke:#64748b;stroke-width:2;fill:none}
+</style></defs>
+<rect width="1200" height="620" fill="#080d1b"/>
+<text x="600" y="45" text-anchor="middle" class="t" font-size="28">CodeArena — System Architecture</text>
+<rect class="box" x="55" y="120" width="245" height="120"/><text class="t" x="177" y="165" text-anchor="middle">Web Client</text><text class="s" x="177" y="195" text-anchor="middle">Next.js · React · Monaco</text>
+<rect class="box" x="390" y="120" width="245" height="120"/><text class="t" x="512" y="165" text-anchor="middle">FastAPI</text><text class="s" x="512" y="195" text-anchor="middle">Auth · Problems · Contests</text>
+<rect class="box" x="790" y="65" width="245" height="100"/><text class="t" x="912" y="105" text-anchor="middle">PostgreSQL</text><text class="s" x="912" y="132" text-anchor="middle">Persistent data</text>
+<rect class="box" x="790" y="220" width="245" height="100"/><text class="t" x="912" y="260" text-anchor="middle">Redis</text><text class="s" x="912" y="287" text-anchor="middle">Queue · Cache · Pub/Sub</text>
+<rect class="box" x="390" y="390" width="245" height="105"/><text class="t" x="512" y="430" text-anchor="middle">Judge Worker</text><text class="s" x="512" y="458" text-anchor="middle">Async evaluation pipeline</text>
+<rect class="box" x="790" y="390" width="245" height="105"/><text class="t" x="912" y="430" text-anchor="middle">Judge0 CE</text><text class="s" x="912" y="458" text-anchor="middle">Sandboxed code execution</text>
+<rect class="box" x="55" y="390" width="245" height="105"/><text class="t" x="177" y="430" text-anchor="middle">AI Adapter</text><text class="s" x="177" y="458" text-anchor="middle">Gemini · Groq · OpenRouter</text>
+<path class="accent" d="M300 180 H390 M635 150 H790 M635 205 H720 V270 H790 M912 165 V220 M790 270 H700 V440 H635 M635 440 H790 M390 440 H300"/>
+<text class="s" x="600" y="565" text-anchor="middle">Untrusted code never runs in the API or frontend process.</text>
+</svg>

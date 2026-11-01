@@ -1,0 +1,81 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: services/api } }
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: { POSTGRES_USER: codearena, POSTGRES_PASSWORD: codearena, POSTGRES_DB: codearena }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U codearena" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://codearena:codearena@localhost:5432/codearena
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -e ".[dev]"
+      - run: ruff check app tests
+      - run: ruff format --check app tests alembic
+      - name: Migrations apply to a fresh database and seed is idempotent
+        run: alembic upgrade head && python -m app.seed && python -m app.seed
+      - run: pytest -q
+
+  web:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: apps/web } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: apps/web/package-lock.json }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    # Uses the built-in FAKE judge (a test double that never runs code) so the queue -> worker ->
+    # DB -> UI loop is exercised without Docker-in-Docker. Real Judge0 is covered by manual QA.
+    needs: [api, web]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: { POSTGRES_USER: codearena, POSTGRES_PASSWORD: codearena, POSTGRES_DB: codearena }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U codearena" --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    env:
+      DATABASE_URL: postgresql+psycopg://codearena:codearena@localhost:5432/codearena
+      REDIS_URL: redis://localhost:6379/0
+      QUEUE_BACKEND: redis
+      JUDGE_BACKEND: fake
+      JWT_SECRET: ci-only-secret-ci-only-secret-ci-only-0123
+      E2E_BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: apps/web/package-lock.json }
+      - run: pip install -e "services/api[dev]"
+      - run: cd services/api && alembic upgrade head && python -m app.seed
+      - run: cd apps/web && npm ci && npm run build && npx playwright install --with-deps chromium
+      - name: Start services
+        run: |
+          cd services/api
+          nohup uvicorn app.main:app --port 8000 > /tmp/api.log 2>&1 &
+          nohup python -m app.workers.judge_worker > /tmp/worker.log 2>&1 &
+          cd ../../apps/web && nohup npx next start -p 3000 > /tmp/web.log 2>&1 &
+          npx --yes wait-on http://localhost:8000/ready http://localhost:3000
+      - run: cd apps/web && npx playwright test
